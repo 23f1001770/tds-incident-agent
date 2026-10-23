@@ -100,7 +100,10 @@ Return only valid JSON in this structure:
 }
 """
 
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(
+    api_key=api_key,
+    http_options={"timeout": 20000},
+)
     response = client.interactions.create(
         model=MODEL,
         input=(

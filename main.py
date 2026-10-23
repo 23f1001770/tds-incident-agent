@@ -1,3 +1,4 @@
+from starlette.concurrency import run_in_threadpool
 import hashlib
 import json
 import os
@@ -275,7 +276,7 @@ async def create_incident(request: Request):
 
     # The planner uses an explicit allowlist and never receives body["sensitive"].
     try:
-        plan = plan_incident(body)
+        plan = await run_in_threadpool(plan_incident, body)
     except Exception:
         return JSONResponse(
             {"error": "incident planning failed safely"},
