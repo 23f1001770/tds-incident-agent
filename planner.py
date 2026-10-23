@@ -101,29 +101,38 @@ Return only valid JSON in this structure:
 """
 
     client = genai.Client(
-    api_key=api_key,
-    http_options={
-        "timeout": 20000,
-        "retry_options": {"attempts": 1},
-    },
-)
-    response = client.interactions.create(
-        model=MODEL,
-        response_mime_type="application/json",
-        generation_config={
-            "max_output_tokens": 2048,
-            "temperature": 0,
+        api_key=api_key,
+        http_options={
+            "timeout": 20000,
+            "retry_options": {"attempts": 1},
         },
-        input=(
-            prompt
-            + "\n\nSAFE INCIDENT DATA:\n"
-            + json.dumps(
-                safe_input,
-                separators=(",", ":"),
-                ensure_ascii=False,
-            )
-        ),
     )
+    try:
+        response = client.interactions.create(
+            model=MODEL,
+            response_mime_type="application/json",
+            generation_config={
+                "max_output_tokens": 2048,
+                "temperature": 0,
+            },
+            input=(
+                prompt
+                + "\n\nSAFE INCIDENT DATA:\n"
+                + json.dumps(
+                    safe_input,
+                    separators=(",", ":"),
+                    ensure_ascii=False,
+                )
+            ),
+        )
+    except Exception as exc:
+        print(
+            f"Gemini request error: {type(exc).__name__}; "
+            f"status={getattr(exc, 'status_code', None)}; "
+            f"message={str(exc)[:500]}",
+            flush=True,
+        )
+        raise
 
     text = response.output_text.strip()
     if text.startswith("```"):
