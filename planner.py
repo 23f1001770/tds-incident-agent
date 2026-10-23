@@ -112,8 +112,8 @@ Return only valid JSON in this structure:
             model=MODEL,
             response_mime_type="application/json",
             response_format={
-                "type": "json_schema",
-                "name": "incident_plan",
+                "type": "text",
+                "mime_type": "application/json",
                 "schema": {
                     "type": "object",
                     "properties": {
