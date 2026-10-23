@@ -109,6 +109,11 @@ Return only valid JSON in this structure:
 )
     response = client.interactions.create(
         model=MODEL,
+        response_mime_type="application/json",
+        generation_config={
+            "max_output_tokens": 2048,
+            "temperature": 0,
+        },
         input=(
             prompt
             + "\n\nSAFE INCIDENT DATA:\n"
