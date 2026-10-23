@@ -111,6 +111,38 @@ Return only valid JSON in this structure:
         response = client.interactions.create(
             model=MODEL,
             response_mime_type="application/json",
+            response_format={
+                "type": "json_schema",
+                "name": "incident_plan",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "rootCause": {"type": "string"},
+                        "evidenceIds": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                        },
+                        "diagnostics": {
+                            "type": "array",
+                            "items": {"type": "object"},
+                        },
+                        "effectCandidates": {
+                            "type": "array",
+                            "items": {"type": "object"},
+                        },
+                        "reasoning": {"type": "string"},
+                    },
+                    "required": [
+                        "rootCause",
+                        "evidenceIds",
+                        "diagnostics",
+                        "effectCandidates",
+                        "reasoning",
+                    ],
+                    "additionalProperties": False,
+                },
+            },
+
             generation_config={
                 "max_output_tokens": 2048,
                 "temperature": 0,
