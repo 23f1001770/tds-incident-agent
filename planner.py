@@ -7,7 +7,7 @@ from google import genai
 
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
-MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
 
 
 def make_safe_input(request: dict) -> dict:
@@ -102,7 +102,10 @@ Return only valid JSON in this structure:
 
     client = genai.Client(
     api_key=api_key,
-    http_options={"timeout": 20000},
+    http_options={
+        "timeout": 10000,
+        "retry_options": {"attempts": 1},
+    },
 )
     response = client.interactions.create(
         model=MODEL,
