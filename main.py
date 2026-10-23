@@ -277,7 +277,8 @@ async def create_incident(request: Request):
     # The planner uses an explicit allowlist and never receives body["sensitive"].
     try:
         plan = await run_in_threadpool(plan_incident, body)
-    except Exception:
+    except Exception as exc:
+        print(f"Incident planning failed: {type(exc).__name__}", flush=True)
         return JSONResponse(
             {"error": "incident planning failed safely"},
             status_code=502,
