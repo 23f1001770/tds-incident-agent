@@ -103,7 +103,7 @@ Return only valid JSON in this structure:
     client = genai.Client(
         api_key=api_key,
         http_options={
-            "timeout": 20000,
+            "timeout": 45000,
             "retry_options": {"attempts": 1},
         },
     )
