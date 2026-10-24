@@ -64,9 +64,12 @@ Never invent evidence IDs, root causes, tools, or tool arguments.
 1. Select exactly one root cause from incident.allowedRootCauses.
 2. Cite 2 to 4 distinct evidence IDs actually present in the transcript.
 3. Select the smallest useful set of 1 to maximumDiagnostics diagnostic
-   tools from toolCatalog. Use exact tool names and schema-compatible,
-   incident-specific arguments. Each diagnostic must cite at least one
-   ID from the diagnosis evidence.
+   tools from toolCatalog. For every diagnostic, copy toolName EXACTLY
+   from the "name" field of one catalog entry. Do not use descriptions,
+   aliases, or invented names. Only use catalog tools that are NOT listed
+   in policy.effectTools. Use schema-compatible, incident-specific
+   arguments matching that tool's inputSchema. Each diagnostic must cite
+   at least one ID from the diagnosis evidence.
 4. Recommend up to 3 ranked effect candidates from policy.effectTools,
    using exact catalog names and schema-compatible arguments. Explain
    briefly when each candidate is appropriate, based only on the
