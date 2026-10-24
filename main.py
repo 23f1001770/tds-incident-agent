@@ -312,29 +312,56 @@ async def create_incident(request: Request):
     if not isinstance(proposed, list):
         return JSONResponse({"error": "invalid diagnostic plan"}, status_code=422)
 
+    
     safe_diagnostics = []
+    rejection_counts = {}
+
+    def reject(reason):
+        rejection_counts[reason] = rejection_counts.get(reason, 0) + 1
+
     for item in proposed:
         if len(safe_diagnostics) >= min(maximum, 3):
             break
         if not isinstance(item, dict):
+            reject("not_an_object")
             continue
+
         name = item.get("toolName")
         arguments = item.get("arguments")
         cited = item.get("evidenceIds")
         tool = catalog_by_name.get(name)
-        if not tool or not isinstance(arguments, dict) or not isinstance(cited, list):
+
+        if not tool:
+            reject("unknown_tool")
+            continue
+        if not isinstance(arguments, dict):
+            reject("arguments_not_object")
+            continue
+        if not isinstance(cited, list):
+            reject("evidence_not_list")
             continue
         if name in set(policy.get("effectTools", [])):
+            reject("effect_tool_used_as_diagnostic")
             continue
         if not cited or len(set(cited)) != len(cited):
+            reject("empty_or_duplicate_evidence")
             continue
         if any(e not in diagnosis_ids or e not in transcript_ids for e in cited):
+            reject("evidence_not_in_diagnosis_and_transcript")
             continue
+
         safe_diagnostics.append({
             "toolName": name,
             "arguments": arguments,
             "evidence": cited,
         })
+
+    print(
+        f"Diagnostic validation: accepted={len(safe_diagnostics)}, "
+        f"rejected={rejection_counts}",
+        flush=True,
+    )
+
 
     if not safe_diagnostics:
         return JSONResponse({"error": "no valid evidence-grounded diagnostic plan"}, status_code=422)
