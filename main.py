@@ -332,6 +332,11 @@ async def create_incident(request: Request):
         tool = catalog_by_name.get(name)
 
         if not tool:
+            print(
+                f"Rejected diagnostic tool name: {name!r}; "
+                f"available catalog names: {list(catalog_by_name.keys())}",
+                flush=True,
+            )
             reject("unknown_tool")
             continue
         if not isinstance(arguments, dict):
