@@ -54,6 +54,15 @@ def plan_incident(request: dict) -> dict:
         raise RuntimeError("GEMINI_API_KEY is not configured")
 
     safe_input = make_safe_input(request)
+    catalog = safe_input.get("toolCatalog", [])
+    effect_tools = set(safe_input.get("policy", {}).get("effectTools", []))
+    diagnostic_names = [
+        tool["name"]
+        for tool in catalog
+        if isinstance(tool, dict)
+        and isinstance(tool.get("name"), str)
+        and tool["name"] not in effect_tools
+    ]
 
     prompt = """
 You are an incident diagnosis and action planner.
@@ -102,7 +111,13 @@ Return only valid JSON in this structure:
   "reasoning": "brief evidence-based explanation"
 }
 """
-
+    prompt += (
+        "\n\nEXACT ALLOWED DIAGNOSTIC TOOL NAMES:\n"
+        + json.dumps(diagnostic_names)
+        + "\nChoose diagnostic toolName values only from this list. "
+          "Copy each name exactly; never invent or rename a tool. "
+          "If the list is empty, return an empty diagnostics array."
+    )
     client = genai.Client(
         api_key=api_key,
         http_options={
